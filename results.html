@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <section class="ammar-quiz-results">
+      <div class="ammar-quiz-app-container">
+        <div class="ammar-quiz-app-wrapper results-wrap">
+          <!-- Header -->
+          <div class="results-header">
+            <div class="results-confetti" id="resultsConfetti">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span>
+            </div>
+            <h2 class="ammar-quiz-app-h2">
+              Quiz <span class="colored-area">Completed!</span>
+            </h2>
+            <p class="results-subtitle">
+              Here's a full breakdown of your performance
+            </p>
+          </div>
+
+          <!-- Score Circle -->
+          <div class="score-circle-wrapper">
+            <div class="score-circle" id="scoreCircle">
+              <div class="score-inner">
+                <span class="score-percentage" id="scorePercentage">0%</span>
+                <span class="score-label">Score</span>
+              </div>
+            </div>
+            <div class="performance-badge" id="performanceBadge">
+              <i class="ri-star-fill"></i>
+              <span id="performanceText">Excellent</span>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="results-stats-grid">
+            <div class="stat-card correct-card">
+              <div class="stat-icon"><i class="ri-check-line"></i></div>
+              <div class="stat-content">
+                <span class="stat-label">Correct Answers</span>
+                <span class="stat-value" id="correctCount">0</span>
+              </div>
+            </div>
+            <div class="stat-card wrong-card">
+              <div class="stat-icon"><i class="ri-close-line"></i></div>
+              <div class="stat-content">
+                <span class="stat-label">Wrong Answers</span>
+                <span class="stat-value" id="wrongCount">0</span>
+              </div>
+            </div>
+            <div class="stat-card total-card">
+              <div class="stat-icon"><i class="ri-file-list-line"></i></div>
+              <div class="stat-content">
+                <span class="stat-label">Total Questions</span>
+                <span class="stat-value" id="totalCount">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-section">
+            <div class="progress-header">
+              <span class="progress-label">Overall Performance</span>
+              <span class="progress-percentage" id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <!-- Interactive Breakdown -->
+          <div class="results-breakdown">
+            <h3 class="breakdown-title">
+              <i class="ri-pie-chart-2-line"></i> Answer Breakdown
+            </h3>
+            <div class="breakdown-chart" id="breakdownChart">
+              <div class="breakdown-bar-wrap">
+                <span class="breakdown-bar-label">Correct</span>
+                <div class="breakdown-bar correct-bar">
+                  <div
+                    class="breakdown-bar-fill correct-fill"
+                    id="correctBarFill"
+                  ></div>
+                </div>
+                <span class="breakdown-bar-count" id="correctBarCount">0</span>
+              </div>
+              <div class="breakdown-bar-wrap">
+                <span class="breakdown-bar-label">Wrong</span>
+                <div class="breakdown-bar wrong-bar">
+                  <div
+                    class="breakdown-bar-fill wrong-fill"
+                    id="wrongBarFill"
+                  ></div>
+                </div>
+                <span class="breakdown-bar-count" id="wrongBarCount">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="results-message" id="resultsMessage">
+            <i class="ri-lightbulb-line"></i>
+            <p>Great effort! Keep practicing to improve your score.</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="results-actions">
+            <a href="/start.html">
+              <button class="ammar-quiz-app-btn btn-retake">
+                <i class="ri-refresh-line"></i> Retake Quiz
+              </button>
+            </a>
+            <a href="/main.html">
+              <button class="ammar-quiz-app-btn btn-home">
+                <i class="ri-home-line"></i> Go Home
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>
