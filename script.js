@@ -228,7 +228,7 @@ const updateQuiz = () => {
     sessionStorage.setItem("correctAnswers", correctAnswersCount);
     sessionStorage.setItem("wrongAnswers", wrongAnswersCount);
     sessionStorage.setItem("totalQuestions", questions.length);
-    window.location.href = "/results.html";
+    window.location.href = "/login.html";
   }
 };
 
@@ -337,4 +337,112 @@ if (window.location.pathname.includes("results")) {
 
   performanceText.textContent = badge;
   resultsMessage.innerHTML = `<p>${message}</p>`;
+}
+
+// ─── Certificate Download ──────────────────────────────
+async function downloadCertificate() {
+  const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+  const firstName = sessionStorage.getItem("userFirstName") || "First";
+  const lastName = sessionStorage.getItem("userLastName") || "Last";
+  const email = sessionStorage.getItem("userEmail") || "";
+  const correctCount = parseInt(sessionStorage.getItem("correctAnswers")) || 0;
+  const totalQuestions =
+    parseInt(sessionStorage.getItem("totalQuestions")) || 20;
+  const percentage = Math.round((correctCount / totalQuestions) * 100);
+  const fullName = firstName + " " + lastName;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  const timeStr = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  // Load the certificate template image
+  const imgResponse = await fetch("/assets/certificate.png");
+  const imgBytes = await imgResponse.arrayBuffer();
+
+  const pdfDoc = await PDFDocument.create();
+  // A4 landscape
+  const page = pdfDoc.addPage([841.89, 595.28]);
+  const { width, height } = page.getSize();
+
+  // Embed the certificate background image
+  const bgImage = await pdfDoc.embedPng(imgBytes);
+  page.drawImage(bgImage, { x: 0, y: 0, width, height });
+
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  // "Certificate of Completion" is already in the image template
+  // "This is presented to :" text is already in the template
+
+  // Recipient name — big, centered, below the "presented to" line
+  const nameFontSize = 42;
+  const nameWidth = fontBold.widthOfTextAtSize(fullName, nameFontSize);
+  page.drawText(fullName, {
+    x: (width - nameWidth) / 2,
+    y: height * 0.44,
+    size: nameFontSize,
+    font: fontBold,
+    color: rgb(0.15, 0.15, 0.15),
+  });
+
+  // Score line
+  const scoreLine = `Crypto Knowledge Quiz  —  Score: ${correctCount}/${totalQuestions}  (${percentage}%)`;
+  const scoreFontSize = 16;
+  const scoreWidth = fontRegular.widthOfTextAtSize(scoreLine, scoreFontSize);
+  page.drawText(scoreLine, {
+    x: (width - scoreWidth) / 2,
+    y: height * 0.33,
+    size: scoreFontSize,
+    font: fontRegular,
+    color: rgb(0.35, 0.35, 0.35),
+  });
+
+  // Email
+  const emailFontSize = 13;
+  const emailWidth = fontRegular.widthOfTextAtSize(email, emailFontSize);
+  page.drawText(email, {
+    x: (width - emailWidth) / 2,
+    y: height * 0.27,
+    size: emailFontSize,
+    font: fontRegular,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+
+  // Date bottom-left area
+  page.drawText(`Date: ${dateStr}`, {
+    x: 110,
+    y: 68,
+    size: 12,
+    font: fontRegular,
+    color: rgb(0.3, 0.3, 0.3),
+  });
+
+  // Time bottom-right area
+  const timeLabel = `Time: ${timeStr}`;
+  const timeLabelWidth = fontRegular.widthOfTextAtSize(timeLabel, 12);
+  page.drawText(timeLabel, {
+    x: width - 110 - timeLabelWidth,
+    y: 68,
+    size: 12,
+    font: fontRegular,
+    color: rgb(0.3, 0.3, 0.3),
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Cryptify_Certificate_${firstName}_${lastName}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
 }

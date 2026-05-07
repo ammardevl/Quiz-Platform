@@ -29,7 +29,7 @@ li {
   --ammar-quiz-white: #fefefe;
   --ammar-quiz-light: #fed263;
   --ammar-quiz-main: #f9a410;
-  --ammar-quiz-contrast: #a45208;
+  --ammar-quiz-contrast: #f9a410;
   --ammar-quiz-dark: #000000;
   --ammar-quiz-trans: all 0.3s ease;
   --ammar-quiz-radius: 8px;
@@ -483,9 +483,11 @@ form.ammar-quiz-app-form input:focus {
 }
 
 .results-header {
-  grid-column: 1 / -1;
   text-align: center;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   flex-direction: column;
   gap: 10px;
   position: relative;
@@ -858,19 +860,13 @@ form.ammar-quiz-app-form input:focus {
 
 /* Action Buttons */
 .results-actions {
-  grid-column: 1 / -1;
   display: flex;
   gap: 15px;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
 }
-.results-actions a {
-  flex: 1;
-  min-width: 150px;
-  max-width: 220px;
-}
+
 .results-actions .ammar-quiz-app-btn {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

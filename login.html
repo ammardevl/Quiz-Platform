@@ -57,6 +57,21 @@
               See Results
             </button>
           </form>
+          <script>
+            document
+              .querySelector(".ammar-quiz-app-form")
+              .addEventListener("submit", function (e) {
+                e.preventDefault();
+                const inputs = this.querySelectorAll("input");
+                const firstName = inputs[0].value.trim();
+                const lastName = inputs[1].value.trim();
+                const email = inputs[2].value.trim();
+                sessionStorage.setItem("userFirstName", firstName);
+                sessionStorage.setItem("userLastName", lastName);
+                sessionStorage.setItem("userEmail", email);
+                window.location.href = "/results.html";
+              });
+          </script>
         </div>
       </div>
     </section>

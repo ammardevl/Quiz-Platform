@@ -9,12 +9,13 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
       rel="stylesheet"
     />
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
   </head>
   <body>
     <section class="ammar-quiz-results">
       <div class="ammar-quiz-app-container">
         <div class="ammar-quiz-app-wrapper results-wrap">
-          <!-- Header -->
           <div class="results-header">
             <div class="results-confetti" id="resultsConfetti">
               <span></span><span></span><span></span><span></span><span></span>
@@ -28,7 +29,6 @@
             </p>
           </div>
 
-          <!-- Score Circle -->
           <div class="score-circle-wrapper">
             <div class="score-circle" id="scoreCircle">
               <div class="score-inner">
@@ -42,7 +42,6 @@
             </div>
           </div>
 
-          <!-- Stats Grid -->
           <div class="results-stats-grid">
             <div class="stat-card correct-card">
               <div class="stat-icon"><i class="ri-check-line"></i></div>
@@ -67,7 +66,6 @@
             </div>
           </div>
 
-          <!-- Progress Bar -->
           <div class="progress-section">
             <div class="progress-header">
               <span class="progress-label">Overall Performance</span>
@@ -78,7 +76,6 @@
             </div>
           </div>
 
-          <!-- Interactive Breakdown -->
           <div class="results-breakdown">
             <h3 class="breakdown-title">
               <i class="ri-pie-chart-2-line"></i> Answer Breakdown
@@ -106,20 +103,23 @@
               </div>
             </div>
           </div>
-
-          <!-- Message -->
           <div class="results-message" id="resultsMessage">
             <i class="ri-lightbulb-line"></i>
             <p>Great effort! Keep practicing to improve your score.</p>
           </div>
-
-          <!-- Action Buttons -->
           <div class="results-actions">
             <a href="/start.html">
               <button class="ammar-quiz-app-btn btn-retake">
                 <i class="ri-refresh-line"></i> Retake Quiz
               </button>
             </a>
+            <button
+              class="ammar-quiz-app-btn"
+              id="downloadCertBtn"
+              onclick="downloadCertificate()"
+            >
+              <i class="ri-award-line"></i> Download Certificate
+            </button>
             <a href="/main.html">
               <button class="ammar-quiz-app-btn btn-home">
                 <i class="ri-home-line"></i> Go Home
