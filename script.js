@@ -354,8 +354,6 @@ async function downloadCertificate() {
   }
 
   const { PDFDocument, rgb } = PDFLib;
-
-  // ── Read from sessionStorage ──
   const firstName = sessionStorage.getItem("userFirstName") || "";
   const lastName = sessionStorage.getItem("userLastName") || "";
   const email = sessionStorage.getItem("userEmail") || "";
@@ -376,7 +374,6 @@ async function downloadCertificate() {
     year: "numeric",
   });
 
-  // ── Load certificate template ──
   let imgBytes;
 
   try {
@@ -392,15 +389,9 @@ async function downloadCertificate() {
     return;
   }
 
-  // ── Create PDF ──
   const pdfDoc = await PDFDocument.create();
 
-  // IMPORTANT
   pdfDoc.registerFontkit(fontkit);
-
-  // ── Load Fonts ──
-  // Put these files inside:
-  // assets/fonts/
 
   const greatVibesBytes = await fetch(
     "assets/fonts/GreatVibes-Regular.ttf",
@@ -409,19 +400,13 @@ async function downloadCertificate() {
   const googleSansFlexBytes = await fetch(
     "assets/fonts/GoogleSansFlex-Regular.ttf",
   ).then((res) => res.arrayBuffer());
-
-  // ── Embed Fonts ──
   const greatVibesFont = await pdfDoc.embedFont(greatVibesBytes);
 
   const googleSansFlexFont = await pdfDoc.embedFont(googleSansFlexBytes);
-
-  // ── A4 Landscape ──
   const pageWidth = 841.89;
   const pageHeight = 595.28;
 
   const page = pdfDoc.addPage([pageWidth, pageHeight]);
-
-  // ── Background Image ──
   const bgImage = await pdfDoc.embedPng(imgBytes);
 
   page.drawImage(bgImage, {
@@ -431,11 +416,9 @@ async function downloadCertificate() {
     height: pageHeight,
   });
 
-  // ── Helper ──
   const cx = (text, font, size) =>
     (pageWidth - font.widthOfTextAtSize(text, size)) / 2;
 
-  // ── Name ──
   const nameFontSize = fullName.length > 24 ? 40 : 60;
 
   page.drawText(fullName, {
@@ -446,7 +429,6 @@ async function downloadCertificate() {
     color: rgb(0.1, 0.1, 0.1),
   });
 
-  // ── Quiz Description ──
   const quizLine = "completed the Cryptocurrency Knowledge Quiz";
 
   page.drawText(quizLine, {
