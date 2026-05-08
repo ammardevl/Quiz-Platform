@@ -1,3 +1,5 @@
+const fontkit = window.fontkit;
+
 const questions = [
   {
     Question: "Who created Bitcoin?",
@@ -228,7 +230,7 @@ const updateQuiz = () => {
     sessionStorage.setItem("correctAnswers", correctAnswersCount);
     sessionStorage.setItem("wrongAnswers", wrongAnswersCount);
     sessionStorage.setItem("totalQuestions", questions.length);
-    window.location.href = "/login.html";
+    window.location.href = "/results.html";
   }
 };
 
@@ -238,7 +240,13 @@ if (btnSubmit) {
     sessionStorage.setItem("correctAnswers", correctAnswersCount);
     sessionStorage.setItem("wrongAnswers", wrongAnswersCount);
     sessionStorage.setItem("totalQuestions", questions.length);
-    window.location.href = "/results.html";
+    firstName = document.getElementById("firstName").value.trim();
+    lastName = document.getElementById("lastName").value.trim();
+    email = document.getElementById("email").value.trim();
+    sessionStorage.setItem("userFirstName", firstName);
+    sessionStorage.setItem("userLastName", lastName);
+    sessionStorage.setItem("userEmail", email);
+    window.location.href = "/quiz.html";
   });
 }
 
@@ -339,110 +347,174 @@ if (window.location.pathname.includes("results")) {
   resultsMessage.innerHTML = `<p>${message}</p>`;
 }
 
-// ─── Certificate Download ──────────────────────────────
 async function downloadCertificate() {
-  const { PDFDocument, rgb, StandardFonts } = PDFLib;
+  if (typeof PDFLib === "undefined") {
+    alert("PDF library is still loading, please try again in a moment.");
+    return;
+  }
 
-  const firstName = sessionStorage.getItem("userFirstName") || "First";
-  const lastName = sessionStorage.getItem("userLastName") || "Last";
+  const { PDFDocument, rgb } = PDFLib;
+
+  // ── Read from sessionStorage ──
+  const firstName = sessionStorage.getItem("userFirstName") || "";
+  const lastName = sessionStorage.getItem("userLastName") || "";
   const email = sessionStorage.getItem("userEmail") || "";
+  const fullName = (firstName + " " + lastName).trim() || "Participant";
+
   const correctCount = parseInt(sessionStorage.getItem("correctAnswers")) || 0;
   const totalQuestions =
     parseInt(sessionStorage.getItem("totalQuestions")) || 20;
-  const percentage = Math.round((correctCount / totalQuestions) * 100);
-  const fullName = firstName + " " + lastName;
+
+  const percentage =
+    totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
   const now = new Date();
+
   const dateStr = now.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
-  const timeStr = now.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
 
-  // Load the certificate template image
-  const imgResponse = await fetch("/assets/certificate.png");
-  const imgBytes = await imgResponse.arrayBuffer();
+  // ── Load certificate template ──
+  let imgBytes;
 
+  try {
+    const res = await fetch("assets/certificate.png");
+
+    if (!res.ok) throw new Error("Image not found");
+
+    imgBytes = await res.arrayBuffer();
+  } catch (err) {
+    alert(
+      "Certificate template not found. Make sure certificate.png is in the assets/ folder.",
+    );
+    return;
+  }
+
+  // ── Create PDF ──
   const pdfDoc = await PDFDocument.create();
-  // A4 landscape
-  const page = pdfDoc.addPage([841.89, 595.28]);
-  const { width, height } = page.getSize();
 
-  // Embed the certificate background image
+  // IMPORTANT
+  pdfDoc.registerFontkit(fontkit);
+
+  // ── Load Fonts ──
+  // Put these files inside:
+  // assets/fonts/
+
+  const greatVibesBytes = await fetch(
+    "assets/fonts/GreatVibes-Regular.ttf",
+  ).then((res) => res.arrayBuffer());
+
+  const googleSansFlexBytes = await fetch(
+    "assets/fonts/GoogleSansFlex-Regular.ttf",
+  ).then((res) => res.arrayBuffer());
+
+  // ── Embed Fonts ──
+  const greatVibesFont = await pdfDoc.embedFont(greatVibesBytes);
+
+  const googleSansFlexFont = await pdfDoc.embedFont(googleSansFlexBytes);
+
+  // ── A4 Landscape ──
+  const pageWidth = 841.89;
+  const pageHeight = 595.28;
+
+  const page = pdfDoc.addPage([pageWidth, pageHeight]);
+
+  // ── Background Image ──
   const bgImage = await pdfDoc.embedPng(imgBytes);
-  page.drawImage(bgImage, { x: 0, y: 0, width, height });
 
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  // "Certificate of Completion" is already in the image template
-  // "This is presented to :" text is already in the template
-
-  // Recipient name — big, centered, below the "presented to" line
-  const nameFontSize = 42;
-  const nameWidth = fontBold.widthOfTextAtSize(fullName, nameFontSize);
-  page.drawText(fullName, {
-    x: (width - nameWidth) / 2,
-    y: height * 0.44,
-    size: nameFontSize,
-    font: fontBold,
-    color: rgb(0.15, 0.15, 0.15),
+  page.drawImage(bgImage, {
+    x: 0,
+    y: 0,
+    width: pageWidth,
+    height: pageHeight,
   });
 
-  // Score line
-  const scoreLine = `Crypto Knowledge Quiz  —  Score: ${correctCount}/${totalQuestions}  (${percentage}%)`;
-  const scoreFontSize = 16;
-  const scoreWidth = fontRegular.widthOfTextAtSize(scoreLine, scoreFontSize);
-  page.drawText(scoreLine, {
-    x: (width - scoreWidth) / 2,
-    y: height * 0.33,
-    size: scoreFontSize,
-    font: fontRegular,
+  // ── Helper ──
+  const cx = (text, font, size) =>
+    (pageWidth - font.widthOfTextAtSize(text, size)) / 2;
+
+  // ── Name ──
+  const nameFontSize = fullName.length > 24 ? 40 : 60;
+
+  page.drawText(fullName, {
+    x: cx(fullName, greatVibesFont, nameFontSize),
+    y: 295,
+    size: nameFontSize,
+    font: greatVibesFont,
+    color: rgb(0.1, 0.1, 0.1),
+  });
+
+  // ── Quiz Description ──
+  const quizLine = "completed the Cryptocurrency Knowledge Quiz";
+
+  page.drawText(quizLine, {
+    x: cx(quizLine, googleSansFlexFont, 15),
+    y: 250,
+    size: 15,
+    font: googleSansFlexFont,
     color: rgb(0.35, 0.35, 0.35),
   });
 
-  // Email
-  const emailFontSize = 13;
-  const emailWidth = fontRegular.widthOfTextAtSize(email, emailFontSize);
-  page.drawText(email, {
-    x: (width - emailWidth) / 2,
-    y: height * 0.27,
-    size: emailFontSize,
-    font: fontRegular,
-    color: rgb(0.5, 0.5, 0.5),
+  // ── Score ──
+  const scoreLine = `Score: ${correctCount} / ${totalQuestions} (${percentage}%)`;
+
+  page.drawText(scoreLine, {
+    x: cx(scoreLine, googleSansFlexFont, 14),
+    y: 220,
+    size: 18,
+    font: googleSansFlexFont,
+    color: rgb(0.87, 0.55, 0.0),
   });
 
-  // Date bottom-left area
+  // ── Email ──
+  if (email) {
+    page.drawText(email, {
+      x: 160,
+      y: 150,
+      size: 13,
+      font: googleSansFlexFont,
+      color: rgb(0.45, 0.45, 0.45),
+    });
+  }
+
+  // ── Date ──
   page.drawText(`Date: ${dateStr}`, {
-    x: 110,
-    y: 68,
+    x: 175,
+    y: 120,
     size: 12,
-    font: fontRegular,
+    font: googleSansFlexFont,
     color: rgb(0.3, 0.3, 0.3),
   });
 
-  // Time bottom-right area
-  const timeLabel = `Time: ${timeStr}`;
-  const timeLabelWidth = fontRegular.widthOfTextAtSize(timeLabel, 12);
-  page.drawText(timeLabel, {
-    x: width - 110 - timeLabelWidth,
-    y: 68,
+  // ── Issuer ──
+  const issuer = "Cryptify Quiz Platform";
+
+  page.drawText(issuer, {
+    x: 545,
+    y: 120,
     size: 12,
-    font: fontRegular,
+    font: googleSansFlexFont,
     color: rgb(0.3, 0.3, 0.3),
   });
 
+  // ── Download ──
   const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+
+  const blob = new Blob([pdfBytes], {
+    type: "application/pdf",
+  });
+
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
+
   a.href = url;
-  a.download = `Cryptify_Certificate_${firstName}_${lastName}.pdf`;
+
+  a.download = `Cryptify Certificate from M. Ammar for ${firstName}_${lastName}.pdf`;
+
   a.click();
+
   URL.revokeObjectURL(url);
 }

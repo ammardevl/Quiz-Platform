@@ -19,6 +19,7 @@
                   type="text"
                   placeholder="Enter first name"
                   name="name"
+                  id="firstName"
                   required
                 />
               </div>
@@ -28,6 +29,7 @@
                   type="text"
                   placeholder="Enter last name"
                   name="name"
+                  id="lastName"
                   required
                 />
               </div>
@@ -41,6 +43,7 @@
                 type="email"
                 placeholder="Enter your email"
                 name="email"
+                id="email"
                 required
               />
             </div>
@@ -50,28 +53,14 @@
                 type="password"
                 placeholder="Enter your password"
                 name="password"
+                id="password"
                 required
               />
             </div>
             <button type="submit" class="ammar-quiz-app-btn submit-btn">
-              See Results
+              Start Quiz
             </button>
           </form>
-          <script>
-            document
-              .querySelector(".ammar-quiz-app-form")
-              .addEventListener("submit", function (e) {
-                e.preventDefault();
-                const inputs = this.querySelectorAll("input");
-                const firstName = inputs[0].value.trim();
-                const lastName = inputs[1].value.trim();
-                const email = inputs[2].value.trim();
-                sessionStorage.setItem("userFirstName", firstName);
-                sessionStorage.setItem("userLastName", lastName);
-                sessionStorage.setItem("userEmail", email);
-                window.location.href = "/results.html";
-              });
-          </script>
         </div>
       </div>
     </section>
