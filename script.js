@@ -175,7 +175,7 @@ const globalHeader = `<header class="ammar-quiz-app-header">
         <div class="ammar-quiz-app-container">
           <div class="ammar-quiz-app-wrapper">
             <div class="ammar-quiz-app-logo">
-              <a href="/main.html">
+              <a href="/index.html">
                 <img
                   src="assets/logo.png"
                   alt="Ammar Quiz Web Application Logo"
